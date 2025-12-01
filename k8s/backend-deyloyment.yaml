@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: paiement-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: paiement-app
+  template:
+    metadata:
+      labels:
+        app: paiement-app
+    spec:
+      containers:
+      - name: paiement-app
+        image: jawhertb/paiementimage:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8089 
+        env:
+        - name: SPRING_DATASOURCE_URL
+          value: "jdbc:mysql://mysql-service:3306/paiementdb?useSSL=false&allowPublicKeyRetrieval=true"
+        - name: SPRING_DATASOURCE_USERNAME
+          value: "root"
+        - name: SPRING_DATASOURCE_PASSWORD
+          value: "rootpassword"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: paiement-service
+spec:
+  selector:
+    app: paiement-app
+  ports:
+    - protocol: TCP
+      port: 80     
+      targetPort: 8089
+  type: NodePort 
